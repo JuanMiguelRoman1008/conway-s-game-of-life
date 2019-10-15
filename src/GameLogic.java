@@ -3,29 +3,35 @@ public class GameLogic {
 	int length;
 	int width;
 	
-	int board[][];
+	Cell board[][];
 	
 	public GameLogic(int length, int width) {
 		this.length = length;
 		this.width = width;
 		
-		this.board= new int[this.length][this.width];
+		this.board= new Cell[this.length][this.width];
 		
-		//fake data
-		this.board = new int[][]
-				{ 
-			{0,0,1,1,0},
-			{0,1,1,0,0},
-			{0,0,0,0,1},
-			{0,0,0,1,0},
-			{0,0,0,0,0}
-				}; 
+		for(int i=0;i<this.length;i++) {
+			for(int j=0;j<this.width;j++) {
+				board[i][j]= new Cell();
+			}
+		}
 	}
 	
-	public void print() {
+	public void printState() {
 		for(int i=0; i<this.length;i++) {
 			for(int j=0; j<this.width;j++) {
-				System.out.print(this.board[i][j] + " ");
+				System.out.print(this.board[i][j].state + " ");
+			}
+			System.out.println();
+		}
+		System.out.println();
+	}
+	
+	public void printNeighbors() {
+		for(int i=0; i<this.length;i++) {
+			for(int j=0; j<this.width;j++) {
+				System.out.print(this.board[i][j].neighbors + " ");
 			}
 			System.out.println();
 		}
@@ -33,15 +39,15 @@ public class GameLogic {
 	}
 	
 	public void click(int x, int y) {
-		if(this.board[x][y]==0) {
-			this.board[x][y] = 1;
+		if(this.board[x][y].state==0) {
+			this.board[x][y].state = 1;
 		}
 		else {
-			this.board[x][y] = 0;
+			this.board[x][y].state = 0;
 		}
 	}
 	
-	public void update() {
+	public void countNeighbors() {
 		for(int i=0; i<this.length;i++) {
 			for(int j=0; j<this.width;j++) {
 				int neighbors = 0;
@@ -49,7 +55,7 @@ public class GameLogic {
 				for(int x=-1; x<=1; x++) {
 					for(int y=-1; y<=1; y++) {
 						try {
-							if(this.board[i+x][j+y]==1 && (x!=i || y!=j)) {
+							if(this.board[i+x][j+y].state==1 && (x!=0 || y!=0)) {
 								neighbors++;
 							}
 						}finally {
@@ -57,28 +63,46 @@ public class GameLogic {
 						}
 					}
 				}
-				
-				System.out.print(neighbors + " ");
-				if(this.board[i][j]==1 && neighbors<2) {
-					this.board[i][j]=0;
-				}
-				else if(this.board[i][j]==1 && neighbors==2) {
-					this.board[i][j]=1;
-				}
-				else if(this.board[i][j]==1 && neighbors>3) {
-					this.board[i][j]=0;
-				}
-				else if(neighbors==3) {
-					this.board[i][j]=1;
-				}
-			}System.out.println();
-		}System.out.println();
-		print();
+				this.board[i][j].neighbors = neighbors;
+			}
+		}
 	}
 	
-	public static void main(String[] args) {
-		GameLogic potato = new GameLogic(5,5);
-		potato.print();
-		potato.update();
+	public void update() {
+		for(int i=0; i<this.length;i++) {
+			for(int j=0; j<this.width;j++) {
+				if(this.board[i][j].state == 1 && this.board[i][j].neighbors<2) {
+					this.board[i][j].state = 0;
+				}else if(this.board[i][j].state == 1 && this.board[i][j].neighbors==2) {
+					this.board[i][j].state = 1;
+				}else if(this.board[i][j].state == 1 && this.board[i][j].neighbors>3) {
+					this.board[i][j].state = 0;
+				}else if(this.board[i][j].neighbors==3) {
+					this.board[i][j].state = 1;
+				}
+			}
+		}
 	}
+	
+	public void updateCycle() {
+		countNeighbors();
+		update();
+		printState();
+	}
+	
+//	public static void main(String[] args) {
+//		GameLogic potato = new GameLogic(5,5);
+//		potato.click(1, 1);
+//		potato.click(1, 2);
+//		potato.click(0, 2);
+//		potato.click(0, 3);
+//		potato.click(3, 3);
+//		potato.click(2, 4);
+//		
+//		int i=0;
+//		while(i!=10) {
+//			potato.updateCycle();
+//			i++;
+//		}
+//	}
 }
