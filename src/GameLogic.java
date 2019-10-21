@@ -87,7 +87,6 @@ public class GameLogic {
 	public void updateCycle() {
 		countNeighbors();
 		update();
-		printState();
 	}
 	
 //	public static void main(String[] args) {
@@ -100,7 +99,7 @@ public class GameLogic {
 //		potato.click(2, 4);
 //		
 //		int i=0;
-//		while(i!=10) {
+//		while(true) {
 //			potato.updateCycle();
 //			i++;
 //		}
